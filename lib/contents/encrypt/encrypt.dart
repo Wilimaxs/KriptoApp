@@ -21,6 +21,7 @@ class _EncryptProcessState extends State<EncryptProcess> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController controllerkunci = TextEditingController();
   final TextEditingController controllerplain = TextEditingController();
+  final TextEditingController controlleralphabet = TextEditingController();
   File? _selectedImage;
   String? selectedImageAPI;
   final ImagePicker _picker = ImagePicker();
@@ -101,22 +102,34 @@ class _EncryptProcessState extends State<EncryptProcess> {
                 ),
                 const SizedBox(height: 20),
 
-                // Keyboard Type
+                // input di aplhabets
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  alignment: Alignment.center,
                   width: width,
                   height: 67,
                   decoration: const BoxDecoration(
-                    color: Colors.grey,
+                    color: Color(0xFFB4AEFF),
                     borderRadius: BorderRadius.all(
                       Radius.circular(25),
                     ),
                   ),
-                  child: const Text(
-                    'Dvork',
-                    style: TextStyle(
-                      fontSize: 15,
+                  child: TextFormField(
+                    controller: controlleralphabet,
+                    decoration: const InputDecoration(
+                      label: Text(
+                        'Alpahbet',
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
                     ),
                   ),
                 ),
@@ -356,6 +369,10 @@ class _EncryptProcessState extends State<EncryptProcess> {
                   width: width,
                   child: ElevatedButton(
                     onPressed: () {
+                      String input = controlleralphabet.text;
+                      String normalizedInput = input.toLowerCase();
+                      bool hasDuplicates = normalizedInput.length !=
+                          normalizedInput.split('').toSet().length;
                       if (controllerkunci.text.isEmpty ||
                           (selectedValueCS ?? '').isEmpty ||
                           (selectedValueIF ?? '').isEmpty ||
@@ -377,6 +394,23 @@ class _EncryptProcessState extends State<EncryptProcess> {
                             ],
                           ),
                         );
+                      } else if (selectedValueCS != 'strict' && hasDuplicates) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Peringatan'),
+                            content: const Text(
+                                'Duplicate Alphabet, Try Change The Alphabet Or Change Your Case Strategy to "Strict" '),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Menutup popup
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
+                        );
                       } else {
                         Navigator.push(
                           context,
@@ -384,6 +418,7 @@ class _EncryptProcessState extends State<EncryptProcess> {
                             builder: (context) => ResultEncrypt(
                               kunci: controllerkunci.text,
                               caseStrategy: selectedValueCS ?? '',
+                              alphabet: controlleralphabet.text,
                               ignoreForeign: selectedValueIF ?? '',
                               plaintext: controllerplain.text,
                               image: _selectedImage,

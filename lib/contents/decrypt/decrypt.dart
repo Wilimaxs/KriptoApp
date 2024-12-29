@@ -16,6 +16,7 @@ class DecryptProcess extends StatefulWidget {
 
 class __DecryptProcessState extends State<DecryptProcess> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController controlleralphabet = TextEditingController();
   File? _selectedImage;
   String? selectedValueCS;
   String? selectedValueIF;
@@ -62,6 +63,39 @@ class __DecryptProcessState extends State<DecryptProcess> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(height: 20),
+                // input di aplhabets
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  alignment: Alignment.center,
+                  width: width,
+                  height: 67,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFB4AEFF),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(25),
+                    ),
+                  ),
+                  child: TextFormField(
+                    controller: controlleralphabet,
+                    decoration: const InputDecoration(
+                      label: Text(
+                        'Alpahbet',
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                    ),
+                  ),
+                ),
+
                 // choose case strategy
                 const SizedBox(height: 20),
                 Container(
@@ -291,6 +325,7 @@ class __DecryptProcessState extends State<DecryptProcess> {
                             builder: (context) => ResultDecrypt(
                               caseStrategy: selectedValueCS,
                               ignoreForeign: selectedValueIF,
+                              alphabet: controlleralphabet.text,
                               image: _selectedImage,
                             ),
                           ),

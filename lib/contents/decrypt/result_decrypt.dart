@@ -8,9 +8,14 @@ class ResultDecrypt extends StatefulWidget {
   final String? caseStrategy;
   final String? ignoreForeign;
   final File? image;
+  final String? alphabet;
 
   const ResultDecrypt(
-      {super.key, required this.image, this.caseStrategy, this.ignoreForeign});
+      {super.key,
+      required this.image,
+      this.caseStrategy,
+      this.ignoreForeign,
+      this.alphabet});
 
   @override
   State<ResultDecrypt> createState() => _ResultDecryptState();
@@ -37,7 +42,7 @@ class _ResultDecryptState extends State<ResultDecrypt> {
 
     final parameters = {
       "image_url": widget.image,
-      "alphabet": "`,.pyfgcrl/=\\aoeuidhtns-;qjkxbmwvz",
+      "alphabet": widget.alphabet,
       "case_strategy": widget.caseStrategy,
       "ignore_foreign": ignoredbool
     };

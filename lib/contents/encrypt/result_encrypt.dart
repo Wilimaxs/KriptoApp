@@ -10,6 +10,7 @@ class ResultEncrypt extends StatefulWidget {
   final String kunci;
   final String? caseStrategy;
   final String? ignoreForeign;
+  final String? alphabet;
   final String plaintext;
   final File? image;
 
@@ -19,7 +20,8 @@ class ResultEncrypt extends StatefulWidget {
       required this.plaintext,
       required this.image,
       this.caseStrategy,
-      this.ignoreForeign});
+      this.ignoreForeign,
+      this.alphabet});
 
   @override
   State<ResultEncrypt> createState() => _ResultEncryptState();
@@ -45,7 +47,7 @@ class _ResultEncryptState extends State<ResultEncrypt> {
     final parameters = {
       "image_url": widget.image,
       "message": widget.plaintext,
-      "alphabet": "`,.pyfgcrl/=\\aoeuidhtns-;qjkxbmwvz",
+      "alphabet": widget.alphabet,
       "key": int.parse(widget.kunci),
       "case_strategy": widget.caseStrategy,
       "ignore_foreign": widget.ignoreForeign

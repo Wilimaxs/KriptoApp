@@ -1,9 +1,10 @@
 import 'dart:io';
 
-import 'package:enkridekrib_app/contents/result_encrypt.dart';
+import 'package:enkridekrib_app/contents/encrypt/result_encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 
 class EncryptProcess extends StatefulWidget {
   const EncryptProcess({super.key});
@@ -15,11 +16,13 @@ class EncryptProcess extends StatefulWidget {
 }
 
 class _EncryptProcessState extends State<EncryptProcess> {
-  String? selectedValue;
+  String? selectedValueCS;
+  String? selectedValueIF;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController controllerkunci = TextEditingController();
   final TextEditingController controllerplain = TextEditingController();
   File? _selectedImage;
+  String? selectedImageAPI;
   final ImagePicker _picker = ImagePicker();
   @override
   Widget build(BuildContext context) {
@@ -77,6 +80,7 @@ class _EncryptProcessState extends State<EncryptProcess> {
                     ),
                   ),
                   child: TextFormField(
+                    keyboardType: TextInputType.number,
                     controller: controllerkunci,
                     decoration: const InputDecoration(
                       label: Text(
@@ -95,8 +99,29 @@ class _EncryptProcessState extends State<EncryptProcess> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
 
-                // choose keyboard
+                // Keyboard Type
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  alignment: Alignment.centerLeft,
+                  width: width,
+                  height: 67,
+                  decoration: const BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(25),
+                    ),
+                  ),
+                  child: const Text(
+                    'Dvork',
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+
+                // choose case strategy
                 const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -113,7 +138,7 @@ class _EncryptProcessState extends State<EncryptProcess> {
                     listSpace: 20,
                     textFieldDecoration: const InputDecoration(
                       label: Text(
-                        'Encryption method',
+                        'Choose Case Strategy',
                         style: TextStyle(
                           color: Colors.black,
                         ),
@@ -136,9 +161,69 @@ class _EncryptProcessState extends State<EncryptProcess> {
                       }
                     },
                     dropDownList: const [
-                      DropDownValueModel(
-                          name: 'french keyboard', value: "french keyboard"),
-                      DropDownValueModel(name: 'dvorak', value: "dvorak"),
+                      DropDownValueModel(name: 'maintain', value: "maintain"),
+                      DropDownValueModel(name: 'ignore', value: "ignore"),
+                      DropDownValueModel(name: 'strict', value: "strict"),
+                    ],
+                    listTextStyle: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                    dropDownItemCount: 3,
+                    onChanged: (val) {
+                      setState(() {
+                        if (val is DropDownValueModel) {
+                          selectedValueCS = val.value;
+                        } else {
+                          selectedValueCS = null;
+                        }
+                      });
+                    },
+                  ),
+                ),
+
+                // choose ignore foreign
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  alignment: Alignment.center,
+                  width: width,
+                  height: 67,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFB4AEFF),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(25),
+                    ),
+                  ),
+                  child: DropDownTextField(
+                    listSpace: 20,
+                    textFieldDecoration: const InputDecoration(
+                      label: Text(
+                        'Choose Ignore Foreign',
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                    ),
+                    listPadding: ListPadding(top: 10),
+                    enableSearch: false,
+                    validator: (value) {
+                      if (value == null) {
+                        return "Required field";
+                      } else {
+                        return null;
+                      }
+                    },
+                    dropDownList: const [
+                      DropDownValueModel(name: 'true', value: "true"),
+                      DropDownValueModel(name: 'false', value: "false"),
                     ],
                     listTextStyle: const TextStyle(
                       color: Colors.black,
@@ -148,9 +233,9 @@ class _EncryptProcessState extends State<EncryptProcess> {
                     onChanged: (val) {
                       setState(() {
                         if (val is DropDownValueModel) {
-                          selectedValue = val.value;
+                          selectedValueIF = val.value;
                         } else {
-                          selectedValue = null;
+                          selectedValueIF = null;
                         }
                       });
                     },
@@ -206,12 +291,13 @@ class _EncryptProcessState extends State<EncryptProcess> {
                         try {
                           final XFile? image = await _picker.pickImage(
                             source: ImageSource.gallery,
-                            imageQuality: 80,
+                            requestFullMetadata: true,
                           );
 
                           if (image != null) {
                             setState(() {
                               _selectedImage = File(image.path);
+                              selectedImageAPI = basename(image.path);
                             });
                           }
                         } catch (e) {
@@ -271,7 +357,8 @@ class _EncryptProcessState extends State<EncryptProcess> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (controllerkunci.text.isEmpty ||
-                          (selectedValue ?? '').isEmpty ||
+                          (selectedValueCS ?? '').isEmpty ||
+                          (selectedValueIF ?? '').isEmpty ||
                           controllerplain.text.isEmpty ||
                           _selectedImage == null) {
                         showDialog(
@@ -296,7 +383,8 @@ class _EncryptProcessState extends State<EncryptProcess> {
                           MaterialPageRoute(
                             builder: (context) => ResultEncrypt(
                               kunci: controllerkunci.text,
-                              method: selectedValue ?? '',
+                              caseStrategy: selectedValueCS ?? '',
+                              ignoreForeign: selectedValueIF ?? '',
                               plaintext: controllerplain.text,
                               image: _selectedImage,
                             ),
@@ -319,6 +407,7 @@ class _EncryptProcessState extends State<EncryptProcess> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

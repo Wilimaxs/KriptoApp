@@ -1,6 +1,6 @@
-import 'package:enkridekrib_app/contents/decrypt.dart';
-import 'package:enkridekrib_app/contents/encrypt.dart';
-import 'package:enkridekrib_app/contents/home.dart';
+import 'package:enkridekrib_app/contents/decrypt/decrypt.dart';
+import 'package:enkridekrib_app/contents/encrypt/encrypt.dart';
+import 'package:enkridekrib_app/contents/dashboard/home.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'enkripsi app',
       initialRoute: DashboardPage.routeName,
       routes: {

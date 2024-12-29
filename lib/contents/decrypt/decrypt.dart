@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:enkridekrib_app/contents/result_decrypt.dart';
+import 'package:dropdown_textfield/dropdown_textfield.dart';
+import 'package:enkridekrib_app/contents/decrypt/result_decrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,8 +16,9 @@ class DecryptProcess extends StatefulWidget {
 
 class __DecryptProcessState extends State<DecryptProcess> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController controllerkunci = TextEditingController();
   File? _selectedImage;
+  String? selectedValueCS;
+  String? selectedValueIF;
   final ImagePicker _picker = ImagePicker();
   @override
   Widget build(BuildContext context) {
@@ -60,8 +62,8 @@ class __DecryptProcessState extends State<DecryptProcess> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
-                // input user for key
+                // choose case strategy
+                const SizedBox(height: 20),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   alignment: Alignment.center,
@@ -73,11 +75,11 @@ class __DecryptProcessState extends State<DecryptProcess> {
                       Radius.circular(25),
                     ),
                   ),
-                  child: TextFormField(
-                    controller: controllerkunci,
-                    decoration: const InputDecoration(
+                  child: DropDownTextField(
+                    listSpace: 20,
+                    textFieldDecoration: const InputDecoration(
                       label: Text(
-                        'Insert your key here',
+                        'Choose Case Strategy',
                         style: TextStyle(
                           color: Colors.black,
                         ),
@@ -90,6 +92,94 @@ class __DecryptProcessState extends State<DecryptProcess> {
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.never,
                     ),
+                    listPadding: ListPadding(top: 10),
+                    enableSearch: false,
+                    validator: (value) {
+                      if (value == null) {
+                        return "Required field";
+                      } else {
+                        return null;
+                      }
+                    },
+                    dropDownList: const [
+                      DropDownValueModel(name: 'maintain', value: "maintain"),
+                      DropDownValueModel(name: 'ignore', value: "ignore"),
+                      DropDownValueModel(name: 'strict', value: "strict"),
+                    ],
+                    listTextStyle: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                    dropDownItemCount: 3,
+                    onChanged: (val) {
+                      setState(() {
+                        if (val is DropDownValueModel) {
+                          selectedValueCS = val.value;
+                        } else {
+                          selectedValueCS = null;
+                        }
+                      });
+                    },
+                  ),
+                ),
+
+                // choose ignore foreign
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  alignment: Alignment.center,
+                  width: width,
+                  height: 67,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFB4AEFF),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(25),
+                    ),
+                  ),
+                  child: DropDownTextField(
+                    listSpace: 20,
+                    textFieldDecoration: const InputDecoration(
+                      label: Text(
+                        'Choose Ignore Foreign',
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                    ),
+                    listPadding: ListPadding(top: 10),
+                    enableSearch: false,
+                    validator: (value) {
+                      if (value == null) {
+                        return "Required field";
+                      } else {
+                        return null;
+                      }
+                    },
+                    dropDownList: const [
+                      DropDownValueModel(name: 'true', value: "true"),
+                      DropDownValueModel(name: 'false', value: "false"),
+                    ],
+                    listTextStyle: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                    dropDownItemCount: 2,
+                    onChanged: (val) {
+                      setState(() {
+                        if (val is DropDownValueModel) {
+                          selectedValueIF = val.value;
+                        } else {
+                          selectedValueIF = null;
+                        }
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -109,7 +199,7 @@ class __DecryptProcessState extends State<DecryptProcess> {
                         try {
                           final XFile? image = await _picker.pickImage(
                             source: ImageSource.gallery,
-                            imageQuality: 80,
+                            requestFullMetadata: true,
                           );
 
                           if (image != null) {
@@ -173,7 +263,10 @@ class __DecryptProcessState extends State<DecryptProcess> {
                   width: width,
                   child: ElevatedButton(
                     onPressed: () {
-                      if (controllerkunci.text.isEmpty ||
+                      if (selectedValueCS == null ||
+                          selectedValueCS!.isEmpty ||
+                          selectedValueIF == null ||
+                          selectedValueIF!.isEmpty ||
                           _selectedImage == null) {
                         showDialog(
                           context: context,
@@ -196,7 +289,8 @@ class __DecryptProcessState extends State<DecryptProcess> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ResultDecrypt(
-                              kunci: controllerkunci.text,
+                              caseStrategy: selectedValueCS,
+                              ignoreForeign: selectedValueIF,
                               image: _selectedImage,
                             ),
                           ),

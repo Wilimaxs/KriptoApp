@@ -371,8 +371,13 @@ class _EncryptProcessState extends State<EncryptProcess> {
                     onPressed: () {
                       String input = controlleralphabet.text;
                       String normalizedInput = input.toLowerCase();
-                      bool hasDuplicates = normalizedInput.length !=
-                          normalizedInput.split('').toSet().length;
+                      bool hasDuplicates =
+                          normalizedInput.replaceAll(' ', '').length !=
+                              normalizedInput
+                                  .replaceAll(' ', '')
+                                  .split('')
+                                  .toSet()
+                                  .length;
                       if (controllerkunci.text.isEmpty ||
                           (selectedValueCS ?? '').isEmpty ||
                           (selectedValueIF ?? '').isEmpty ||

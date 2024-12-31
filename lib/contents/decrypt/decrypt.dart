@@ -17,9 +17,10 @@ class DecryptProcess extends StatefulWidget {
 class __DecryptProcessState extends State<DecryptProcess> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController controlleralphabet = TextEditingController();
+  final TextEditingController controllerkey = TextEditingController();
+  bool isvisible = false;
   File? _selectedImage;
-  String? selectedValueCS;
-  String? selectedValueIF;
+  String? kondisi;
   final ImagePicker _picker = ImagePicker();
   @override
   Widget build(BuildContext context) {
@@ -63,6 +64,71 @@ class __DecryptProcessState extends State<DecryptProcess> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // choose internal or external
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  alignment: Alignment.center,
+                  width: width,
+                  height: 67,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFB4AEFF),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(25),
+                    ),
+                  ),
+                  child: DropDownTextField(
+                    listSpace: 20,
+                    textFieldDecoration: const InputDecoration(
+                      label: Text(
+                        'Choose external or internal',
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                    ),
+                    listPadding: ListPadding(top: 10),
+                    enableSearch: false,
+                    validator: (value) {
+                      if (value == null) {
+                        return "Required field";
+                      } else {
+                        return null;
+                      }
+                    },
+                    dropDownList: const [
+                      DropDownValueModel(name: 'Iya', value: "Iya"),
+                      DropDownValueModel(name: 'Tidak', value: "Tidak"),
+                    ],
+                    listTextStyle: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                    dropDownItemCount: 2,
+                    onChanged: (val) {
+                      setState(() {
+                        if (val is DropDownValueModel) {
+                          kondisi = val.value;
+                          if (val.value == "Iya") {
+                            isvisible = false;
+                          } else {
+                            isvisible = true;
+                          }
+                        } else {
+                          kondisi = null;
+                        }
+                      });
+                    },
+                  ),
+                ),
+
                 const SizedBox(height: 20),
                 // input di aplhabets
                 Container(
@@ -96,127 +162,41 @@ class __DecryptProcessState extends State<DecryptProcess> {
                   ),
                 ),
 
-                // choose case strategy
                 const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  alignment: Alignment.center,
-                  width: width,
-                  height: 67,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFB4AEFF),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(25),
+                // input di key
+                Visibility(
+                  visible: isvisible,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    alignment: Alignment.center,
+                    width: width,
+                    height: 67,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFB4AEFF),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(25),
+                      ),
                     ),
-                  ),
-                  child: DropDownTextField(
-                    listSpace: 20,
-                    textFieldDecoration: const InputDecoration(
-                      label: Text(
-                        'Choose Case Strategy',
-                        style: TextStyle(
-                          color: Colors.black,
+                    child: TextFormField(
+                      controller: controllerkey,
+                      decoration: const InputDecoration(
+                        label: Text(
+                          'Key',
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
                         ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide.none,
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
                     ),
-                    listPadding: ListPadding(top: 10),
-                    enableSearch: false,
-                    validator: (value) {
-                      if (value == null) {
-                        return "Required field";
-                      } else {
-                        return null;
-                      }
-                    },
-                    dropDownList: const [
-                      DropDownValueModel(name: 'maintain', value: "maintain"),
-                      DropDownValueModel(name: 'ignore', value: "ignore"),
-                      DropDownValueModel(name: 'strict', value: "strict"),
-                    ],
-                    listTextStyle: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                    ),
-                    dropDownItemCount: 3,
-                    onChanged: (val) {
-                      setState(() {
-                        if (val is DropDownValueModel) {
-                          selectedValueCS = val.value;
-                        } else {
-                          selectedValueCS = null;
-                        }
-                      });
-                    },
                   ),
                 ),
-
-                // choose ignore foreign
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  alignment: Alignment.center,
-                  width: width,
-                  height: 67,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFB4AEFF),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(25),
-                    ),
-                  ),
-                  child: DropDownTextField(
-                    listSpace: 20,
-                    textFieldDecoration: const InputDecoration(
-                      label: Text(
-                        'Choose Ignore Foreign',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide.none,
-                      ),
-                      floatingLabelBehavior: FloatingLabelBehavior.never,
-                    ),
-                    listPadding: ListPadding(top: 10),
-                    enableSearch: false,
-                    validator: (value) {
-                      if (value == null) {
-                        return "Required field";
-                      } else {
-                        return null;
-                      }
-                    },
-                    dropDownList: const [
-                      DropDownValueModel(name: 'true', value: "true"),
-                      DropDownValueModel(name: 'false', value: "false"),
-                    ],
-                    listTextStyle: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                    ),
-                    dropDownItemCount: 2,
-                    onChanged: (val) {
-                      setState(() {
-                        if (val is DropDownValueModel) {
-                          selectedValueIF = val.value;
-                        } else {
-                          selectedValueIF = null;
-                        }
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(height: 20),
 
                 // Chooser User Image
                 Row(
@@ -297,10 +277,7 @@ class __DecryptProcessState extends State<DecryptProcess> {
                   width: width,
                   child: ElevatedButton(
                     onPressed: () {
-                      if (selectedValueCS == null ||
-                          selectedValueCS!.isEmpty ||
-                          selectedValueIF == null ||
-                          selectedValueIF!.isEmpty ||
+                      if (controlleralphabet.text.isEmpty ||
                           _selectedImage == null) {
                         showDialog(
                           context: context,
@@ -318,15 +295,33 @@ class __DecryptProcessState extends State<DecryptProcess> {
                             ],
                           ),
                         );
+                      } else if (kondisi == 'iya' &&
+                          controllerkey.text.isEmpty) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Peringatan'),
+                            content: const Text(
+                                'Key Harus Disi karena Memilih Internal'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // Menutup popup
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
+                        );
                       } else {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => ResultDecrypt(
-                              caseStrategy: selectedValueCS,
-                              ignoreForeign: selectedValueIF,
                               alphabet: controlleralphabet.text,
                               image: _selectedImage,
+                              kunci: controllerkey.text,
+                              kondisi: kondisi,
                             ),
                           ),
                         );

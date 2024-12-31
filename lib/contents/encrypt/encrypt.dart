@@ -417,19 +417,58 @@ class _EncryptProcessState extends State<EncryptProcess> {
                           ),
                         );
                       } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ResultEncrypt(
-                              kunci: controllerkunci.text,
-                              caseStrategy: selectedValueCS ?? '',
-                              alphabet: controlleralphabet.text,
-                              ignoreForeign: selectedValueIF ?? '',
-                              plaintext: controllerplain.text,
-                              image: _selectedImage,
-                            ),
-                          ),
-                        );
+                        showDialog<String>(
+                          context: context,
+                          barrierDismissible:
+                              true, // Allow dismissing by tapping outside
+                          builder: (BuildContext context) {
+                            return WillPopScope(
+                              onWillPop: () async {
+                                Navigator.of(context)
+                                    .pop(); // Just close the dialog
+                                return false;
+                              },
+                              child: AlertDialog(
+                                title: const Text('Konfirmasi'),
+                                content:
+                                    const Text('Apakah ingin menyimpan key?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('Tidak'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop('tidak');
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: const Text('Iya'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop('iya');
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ).then((value) {
+                          // Only navigate if user explicitly chose an option (clicked a button)
+                          if (value != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ResultEncrypt(
+                                  kunci: controllerkunci.text,
+                                  caseStrategy: selectedValueCS ?? '',
+                                  alphabet: controlleralphabet.text,
+                                  ignoreForeign: selectedValueIF ?? '',
+                                  plaintext: controllerplain.text,
+                                  image: _selectedImage,
+                                  kondisi: value,
+                                ),
+                              ),
+                            );
+                          }
+                          // If value is null (back button pressed), do nothing
+                        });
                       }
                     },
                     style: ButtonStyle(

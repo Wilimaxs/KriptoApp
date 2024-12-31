@@ -5,13 +5,23 @@ import 'package:enkridekrib_app/API/models/modes_dekrip.dart';
 import 'package:http/http.dart' as http;
 
 class ApiServiceDekrip {
-  final String baseUrl = 'http://13.250.38.115:5000/api/decode/upload';
+  final String baseUrlInternal =
+      'https://jay-fit-safely.ngrok-free.app/api/decrypt/internal-key';
+  final String baseUrlEksternal =
+      'https://jay-fit-safely.ngrok-free.app/api/decrypt/external-key';
 
   // take all data with json
   Future<DekripResult> fetchDataDenkrip(Map<String, dynamic> parameters) async {
     try {
       // Create multipart request
-      final request = http.MultipartRequest('POST', Uri.parse(baseUrl));
+      http.MultipartRequest request;
+      if (parameters['kondisi'] == "Iya") {
+        request = http.MultipartRequest('POST', Uri.parse(baseUrlInternal));
+        print('ini internal: $baseUrlInternal');
+      } else {
+        request = http.MultipartRequest('POST', Uri.parse(baseUrlEksternal));
+        print("ini ekternal: baseUrlEksternal");
+      }
 
       // Add file if it exists
       if (parameters['image_url'] != null && parameters['image_url'] is File) {
@@ -22,20 +32,27 @@ class ApiServiceDekrip {
           ),
         );
       }
-
       // Create JSON data excluding the image
-      final Map<String, dynamic> jsonData = {
-        'alphabet': parameters['alphabet'],
-        'case_strategy': parameters['case_strategy'],
-        'ignore_foreign': parameters['ignore_foreign'],
-      };
+      final Map<String, dynamic> jsonData;
+      if (parameters['kondisi'] == "Iya") {
+        jsonData = {
+          'alphabet': parameters['alphabet'],
+        };
+        print('ini tidak ada key');
+      } else {
+        jsonData = {
+          'alphabet': parameters['alphabet'],
+          'key': int.parse(parameters['key']),
+        };
+        print(parameters['key']);
+      }
 
       // Add the JSON data as a field
       request.fields['data'] = json.encode(jsonData);
 
       // Send the request
       final streamedResponse = await request.send().timeout(
-            const Duration(seconds: 10),
+            const Duration(seconds: 30),
           );
 
       // Get the response

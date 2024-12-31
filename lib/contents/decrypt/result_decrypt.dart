@@ -5,17 +5,17 @@ import 'package:enkridekrib_app/API/eksternal/request_dekrip_api.dart';
 import 'package:flutter/material.dart';
 
 class ResultDecrypt extends StatefulWidget {
-  final String? caseStrategy;
-  final String? ignoreForeign;
+  final String kunci;
+  final String? kondisi;
   final File? image;
   final String? alphabet;
 
   const ResultDecrypt(
       {super.key,
       required this.image,
-      this.caseStrategy,
-      this.ignoreForeign,
-      this.alphabet});
+      this.alphabet,
+      required this.kunci,
+      required this.kondisi});
 
   @override
   State<ResultDecrypt> createState() => _ResultDecryptState();
@@ -37,15 +37,21 @@ class _ResultDecryptState extends State<ResultDecrypt> {
     setState(() {
       _isLoading = true;
     });
-
-    bool ignoredbool = widget.ignoreForeign?.toLowerCase() == 'true';
-
-    final parameters = {
-      "image_url": widget.image,
-      "alphabet": widget.alphabet,
-      "case_strategy": widget.caseStrategy,
-      "ignore_foreign": ignoredbool
-    };
+    Map<String, dynamic> parameters;
+    if (widget.kondisi == 'Iya') {
+      parameters = {
+        "image_url": widget.image,
+        "alphabet": widget.alphabet,
+        "kondisi": widget.kondisi,
+      };
+    } else {
+      parameters = {
+        "image_url": widget.image,
+        "alphabet": widget.alphabet,
+        "kondisi": widget.kondisi,
+        "key": widget.kunci,
+      };
+    }
 
     try {
       final response = await _apiService.fetchDataDenkrip(parameters);

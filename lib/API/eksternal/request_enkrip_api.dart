@@ -7,7 +7,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
 class ApiServiceEnkrip {
-  final String baseUrl = 'http://13.250.38.115:5000/api/encode/upload';
+  final String baseUrlInternal =
+      'https://jay-fit-safely.ngrok-free.app/api/encrypt/internal-key';
+  final String baseUrlEksternal =
+      'https://jay-fit-safely.ngrok-free.app/api/encrypt/external-key';
   File? _downloadedImage;
 
   File? get downloadedImage => _downloadedImage;
@@ -16,7 +19,12 @@ class ApiServiceEnkrip {
   Future<EnkripResult> fetchDataEnkrip(Map<String, dynamic> parameters) async {
     try {
       // Create multipart request
-      final request = http.MultipartRequest('POST', Uri.parse(baseUrl));
+      http.MultipartRequest request;
+      if (parameters['kondisi'] == "iya") {
+        request = http.MultipartRequest('POST', Uri.parse(baseUrlInternal));
+      } else {
+        request = http.MultipartRequest('POST', Uri.parse(baseUrlEksternal));
+      }
 
       // Add file
       if (parameters['image_url'] != null && parameters['image_url'] is File) {

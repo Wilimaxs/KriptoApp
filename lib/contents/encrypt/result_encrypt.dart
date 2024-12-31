@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:enkridekrib_app/API/models/model_enkrip.dart';
@@ -13,6 +14,7 @@ class ResultEncrypt extends StatefulWidget {
   final String? alphabet;
   final String plaintext;
   final File? image;
+  final String kondisi;
 
   const ResultEncrypt(
       {super.key,
@@ -21,7 +23,8 @@ class ResultEncrypt extends StatefulWidget {
       required this.image,
       this.caseStrategy,
       this.ignoreForeign,
-      this.alphabet});
+      this.alphabet,
+      required this.kondisi});
 
   @override
   State<ResultEncrypt> createState() => _ResultEncryptState();
@@ -40,31 +43,72 @@ class _ResultEncryptState extends State<ResultEncrypt> {
   }
 
   Future<void> fetchResultEnkrip() async {
+    if (!mounted) return; // Early return if widget is unmounted
+
     setState(() {
       _isLoading = true;
     });
 
-    final parameters = {
-      "image_url": widget.image,
-      "message": widget.plaintext,
-      "alphabet": widget.alphabet,
-      "key": int.parse(widget.kunci),
-      "case_strategy": widget.caseStrategy,
-      "ignore_foreign": widget.ignoreForeign
-    };
-
     try {
+      // Validate amount/key before parsing
+      final keyValue = int.tryParse(widget.kunci);
+      if (keyValue == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Key harus berupa angka yang valid')),
+        );
+        return;
+      }
+
+      final parameters = {
+        "image_url": widget.image,
+        "message": widget.plaintext,
+        "alphabet": widget.alphabet,
+        "key": keyValue,
+        "case_strategy": widget.caseStrategy,
+        "ignore_foreign": widget.ignoreForeign,
+        "kondisi": widget.kondisi,
+      };
+
+      // Check required fields
+      if (widget.image == null || widget.plaintext.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image dan pesan tidak boleh kosong')),
+        );
+        return;
+      }
+
       final response = await _apiService.fetchDataEnkrip(parameters);
+      if (!mounted) return; // Check mounted state after async operation
+
       final responseimage = await _apiService.downloadImage(response.imageUrl);
+      if (!mounted) return; // Check mounted state after second async operation
+
       setState(() {
         _selectedImage = responseimage;
         _apiResponse = response;
       });
     } catch (e) {
+      if (!mounted) return; // Check mounted state before showing error
+
+      String errorMessage = 'Terjadi kesalahan';
+      if (e is FormatException) {
+        errorMessage = 'Format input tidak valid';
+      } else if (e is TimeoutException) {
+        errorMessage = 'Koneksi timeout, silakan coba lagi';
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
       );
     } finally {
+      if (!mounted) return;
+
       setState(() {
         _isLoading = false;
       });

@@ -3,9 +3,9 @@
 ## 📱 Preview
 
 <div style="display: flex; flex-direction: column; align-items: center;">
-  <img src="assets/1.png" alt="Encryption Screen" style="width: 50%;" />
-  <img src="assets/2.png" alt="Steganography Screen" style="width: 50%; margin-top: 10px;" />
-  <img src="assets/3.png" alt="Decryption Screen" style="width: 50%; margin-top: 10px;" />
+  <img src="assets/1.png" alt="Encryption Screen" style="width: 20%;" />
+  <img src="assets/2.png" alt="Steganography Screen" style="width: 20%; margin-top: 10px;" />
+  <img src="assets/3.png" alt="Decryption Screen" style="width: 20%; margin-top: 10px;" />
 </div>
 
 ## 🌟 Overview
